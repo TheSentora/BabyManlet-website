@@ -164,7 +164,7 @@ a {
   border: 1px solid var(--border);
   background:
     linear-gradient(180deg, rgba(10, 9, 8, 0.25) 0%, rgba(10, 9, 8, 0.55) 60%, rgba(10, 9, 8, 0.9) 100%),
-    url("/hero.jpg") center / cover no-repeat,
+    url("/hero.png") center / cover no-repeat,
     var(--panel);
 }
 
