@@ -6,7 +6,8 @@ import { useTokenFeed } from "./useTokenFeed";
 const MINT = "FULwoFmBd9fjviRV5K4Yad1UgdYuurDjASrMVv7spump";
 const X_URL = "https://x.com/Baby_Manlet";
 const TG_URL = "https://t.me/baby_manlet";
-const BUY_URL = `https://pump.fun/coin/${MINT}`;
+const BUY_URL =
+  "https://www.pinksale.finance/solana/launchpad/HQwJGasUg7N4RRJnUUj2jgMTAAEVtVEFwzhHKbSBd64r";
 
 const PER_PAGE = 10;
 
