@@ -299,6 +299,26 @@ export default function Page() {
         </div>
       </section>
 
+      <section className="section" id="partners">
+        <div className="section-head">
+          <div>
+            <span className="section-num">/05</span>
+            <h2 className="section-title display">Partners</h2>
+          </div>
+          <div className="section-side">backed by</div>
+        </div>
+
+        <div className="partners-row">
+          {/* replace /public/pinksale.png and /public/dexview.png */}
+          <div className="partner">
+            <img src="/pinksale.png" alt="PinkSale" className="partner-logo" />
+          </div>
+          <div className="partner">
+            <img src="/dexview.png" alt="DexView" className="partner-logo" />
+          </div>
+        </div>
+      </section>
+
       <footer className="footer">
         <div className="footer-inner">
           <div className="footer-brand display">
