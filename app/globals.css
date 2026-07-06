@@ -366,6 +366,11 @@ a {
   color: var(--orange);
 }
 
+.feed-tag.move {
+  border-color: var(--dim);
+  color: var(--dim);
+}
+
 .feed-text {
   flex: 1;
   color: var(--text);
@@ -380,6 +385,10 @@ a {
   color: var(--dim);
   flex-shrink: 0;
   font-size: 13px;
+}
+
+.feed-sig:hover {
+  color: var(--orange);
 }
 
 .feed-empty {
@@ -418,11 +427,22 @@ a {
 .feed-page-btn {
   border: 1px solid var(--border);
   background: transparent;
-  color: var(--dim);
+  color: var(--muted);
   font-family: var(--font-mono), monospace;
   font-size: 12px;
   padding: 7px 14px;
-  cursor: not-allowed;
+  cursor: pointer;
+}
+
+.feed-page-btn:hover:not(:disabled) {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.feed-page-btn:disabled {
+  color: var(--dim);
+  opacity: 0.5;
+  cursor: default;
 }
 
 .feed-note {

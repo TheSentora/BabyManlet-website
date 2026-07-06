@@ -1,27 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTokenFeed } from "./useTokenFeed";
 
-// ---- edit these before launch ----
-const X_URL = "https://x.com/"; // your X profile
-const BUY_URL = "#"; // presale / dex link
-const CONTRACT_ADDRESS = ""; // leave empty until launch -> shows TBA
-// ----------------------------------
+const MINT = "FULwoFmBd9fjviRV5K4Yad1UgdYuurDjASrMVv7spump";
+const X_URL = "https://x.com/Baby_Manlet";
+const TG_URL = "https://t.me/baby_manlet";
+const BUY_URL = `https://pump.fun/coin/${MINT}`;
 
-type FeedEvent = {
-  type: "AIRDROP" | "BUYBACK";
-  text: string;
-  amount: string;
-  sig: string;
-};
-
-// feed is empty for now — push events here when the script goes live
-const FEED_EVENTS: FeedEvent[] = [];
+const PER_PAGE = 10;
 
 export default function Page() {
   const [copied, setCopied] = useState(false);
   const [logoOk, setLogoOk] = useState(false);
   const [artOk, setArtOk] = useState(false);
+  const [page, setPage] = useState(0);
+
+  const events = useTokenFeed(MINT);
 
   // probe /public images so fallbacks show until you drop the files in
   useEffect(() => {
@@ -35,18 +30,20 @@ export default function Page() {
     probe("/baby.png", setArtOk);
   }, []);
 
-  const ca = CONTRACT_ADDRESS || "TBA";
-  const caShort =
-    CONTRACT_ADDRESS.length > 16
-      ? `${CONTRACT_ADDRESS.slice(0, 6)}…${CONTRACT_ADDRESS.slice(-6)}`
-      : ca;
+  const caShort = `${MINT.slice(0, 6)}…${MINT.slice(-6)}`;
 
   const copyCa = async () => {
-    if (!CONTRACT_ADDRESS) return;
-    await navigator.clipboard.writeText(CONTRACT_ADDRESS);
+    await navigator.clipboard.writeText(MINT);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
+
+  const pages = Math.max(1, Math.ceil(events.length / PER_PAGE));
+  const safePage = Math.min(page, pages - 1);
+  const pageEvents = events.slice(
+    safePage * PER_PAGE,
+    (safePage + 1) * PER_PAGE
+  );
 
   return (
     <>
@@ -67,20 +64,23 @@ export default function Page() {
           <a href="#token">Token</a>
         </div>
         <div className="nav-spacer" />
-        <a href={BUY_URL} className="btn">
+        <a href={BUY_URL} target="_blank" rel="noopener noreferrer" className="btn">
           Buy $BABYMANLET →
         </a>
         <a href={X_URL} target="_blank" rel="noopener noreferrer" className="btn btn-x">
           X ↗
         </a>
+        <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="btn btn-x">
+          TG ↗
+        </a>
       </nav>
 
       <header className="hero-wrap" id="top">
-        {/* hero background = /public/hero.jpg */}
+        {/* hero background = /public/hero.png */}
         <div className="hero">
           <div className="hero-badge">
             <span className="dot" />
-            Soon on Solana
+            Live on Solana
           </div>
           <div className="hero-kicker">/ Return to Memes</div>
           <h1 className="hero-title display">
@@ -92,7 +92,7 @@ export default function Page() {
             bag. just the script.
           </p>
           <div className="hero-cta">
-            <a href={BUY_URL} className="btn">
+            <a href={BUY_URL} target="_blank" rel="noopener noreferrer" className="btn">
               Buy $BABYMANLET →
             </a>
             <div className="ca-row">
@@ -124,35 +124,57 @@ export default function Page() {
               <span className="dot" />
               BABYMANLET@SOLANA ~/FEED.LOG
             </span>
-            <span className="feed-header-right">buybacks + airdrops</span>
+            <span className="feed-header-right">buys · sells · transfers</span>
           </div>
 
-          {FEED_EVENTS.length === 0 ? (
+          {events.length === 0 ? (
             <div className="feed-empty">
-              {"// no events yet"}
-              <br />
-              {"// feed goes live at launch"}
+              {"// listening for on-chain activity"}
               <span className="cursor" />
             </div>
           ) : (
-            FEED_EVENTS.map((e, i) => (
-              <div className="feed-row" key={i}>
+            pageEvents.map((e) => (
+              <div className="feed-row" key={e.sig}>
                 <span
-                  className={`feed-tag ${e.type === "BUYBACK" ? "buyback" : ""}`}
+                  className={`feed-tag ${
+                    e.type === "BUY" ? "buyback" : e.type === "MOVE" ? "move" : ""
+                  }`}
                 >
                   {e.type}
                 </span>
                 <span className="feed-text">{e.text}</span>
                 <span className="feed-amount">{e.amount}</span>
-                <span className="feed-sig">{e.sig}</span>
+                <a
+                  className="feed-sig"
+                  href={`https://solscan.io/tx/${e.sig}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {e.sig.slice(0, 6)}…{e.sig.slice(-4)}
+                </a>
               </div>
             ))
           )}
 
           <div className="feed-footer">
-            <button className="feed-page-btn">← prev</button>
-            <span>PAGE 0 / 0 · {FEED_EVENTS.length} EVENTS</span>
-            <button className="feed-page-btn">next →</button>
+            <button
+              className="feed-page-btn"
+              disabled={safePage === 0}
+              onClick={() => setPage(safePage - 1)}
+            >
+              ← prev
+            </button>
+            <span>
+              PAGE {events.length ? safePage + 1 : 0} /{" "}
+              {events.length ? pages : 0} · {events.length} EVENTS
+            </span>
+            <button
+              className="feed-page-btn"
+              disabled={safePage >= pages - 1}
+              onClick={() => setPage(safePage + 1)}
+            >
+              next →
+            </button>
           </div>
         </div>
         <div className="feed-note">{"// ALL SIGS VERIFIABLE ON-CHAIN"}</div>
@@ -185,7 +207,7 @@ export default function Page() {
             <div className="stat-value display">—</div>
           </div>
         </div>
-        <div className="feed-note">{"// stats go live at launch"}</div>
+        <div className="feed-note">{"// coming soon"}</div>
       </section>
 
       <section className="section" id="how">
@@ -282,9 +304,14 @@ export default function Page() {
           <div className="footer-brand display">
             We are the <span className="accent">Baby Manlets.</span>
           </div>
-          <a href={X_URL} target="_blank" rel="noopener noreferrer" className="btn btn-x">
-            X ↗
-          </a>
+          <div style={{ display: "flex", gap: 10 }}>
+            <a href={X_URL} target="_blank" rel="noopener noreferrer" className="btn btn-x">
+              X ↗
+            </a>
+            <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="btn btn-x">
+              TG ↗
+            </a>
+          </div>
         </div>
         <div className="footer-inner" style={{ marginTop: 18 }}>
           <div className="footer-note">
