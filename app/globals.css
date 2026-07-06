@@ -371,6 +371,12 @@ a {
   color: var(--dim);
 }
 
+.feed-tag.presale {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #000;
+}
+
 .feed-text {
   flex: 1;
   color: var(--text);
