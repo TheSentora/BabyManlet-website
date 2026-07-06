@@ -2,9 +2,17 @@ import { useEffect, useRef, useState } from "react";
 
 export type FeedEvent = {
   sig: string;
-  type: "BUY" | "SELL" | "MOVE";
+  type: "BUY" | "SELL" | "MOVE" | "PRESALE";
   text: string;
   amount: string;
+};
+
+// pin specific txs to custom labels (launch events); everything else auto-classifies
+const LABEL_OVERRIDES: Record<string, Omit<FeedEvent, "sig">> = {
+  UbYtsg7etwjmKuw9NeDGtZUsKHXQ2kNg8t5HBjUJP2qimi6w2iB5mgN5jz5eHBFBTvVVBcD8ezMYVNPVFiw3bo7:
+    { type: "PRESALE", text: "Presale created", amount: "950.16M" },
+  CRzFRcEvsXGPxStaEmpnZNz2pKjChtv2nrgLXkY2dLCUBiuKuCCaMgUfZtfxyvERa427RYmZvL1qyKuKagDRi1b:
+    { type: "BUY", text: "Bought 1 000 000 000 BABYMANLET", amount: "0.0186 SOL" },
 };
 
 // api.mainnet-beta.solana.com 403s browser requests — publicnode allows CORS
@@ -139,6 +147,11 @@ export function useTokenFeed(mint: string) {
       const batch: FeedEvent[] = [];
       for (const s of fresh) {
         seen.current.add(s.signature);
+        const override = LABEL_OVERRIDES[s.signature];
+        if (override) {
+          batch.push({ ...override, sig: s.signature });
+          continue;
+        }
         const tx = await rpc<Tx>("getTransaction", [
           s.signature,
           { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 },

@@ -138,7 +138,13 @@ export default function Page() {
               <div className="feed-row" key={e.sig}>
                 <span
                   className={`feed-tag ${
-                    e.type === "BUY" ? "buyback" : e.type === "MOVE" ? "move" : ""
+                    e.type === "BUY"
+                      ? "buyback"
+                      : e.type === "MOVE"
+                        ? "move"
+                        : e.type === "PRESALE"
+                          ? "presale"
+                          : ""
                   }`}
                 >
                   {e.type}
